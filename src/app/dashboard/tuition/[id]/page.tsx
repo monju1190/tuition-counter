@@ -6,12 +6,14 @@ import { ArrowLeft, CheckCircle2, Calendar, RotateCcw } from 'lucide-react'
 import { addClassEntry, resetTuitionCycle } from '@/actions/tuitions'
 import { format } from 'date-fns'
 
-export default async function TuitionPage({ params }: { params: { id: string } }) {
+export default async function TuitionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  
   const session = await getSession()
   if (!session) return redirect('/')
 
   const tuition = await prisma.tuition.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       entries: {
         orderBy: { date: 'desc' }
