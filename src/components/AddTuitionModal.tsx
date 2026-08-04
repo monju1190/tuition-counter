@@ -25,9 +25,9 @@ export default function AddTuitionModal() {
 
   return (
     <>
-      <button 
-        onClick={() => setIsOpen(true)} 
-        className="btn-primary" 
+      <button
+        onClick={() => setIsOpen(true)}
+        className="btn-primary"
         style={{ width: 'auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
       >
         <Plus size={16} /> Add Tuition
@@ -37,29 +37,29 @@ export default function AddTuitionModal() {
         {isOpen && (
           <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
             zIndex: 1000,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '1rem'
           }}>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="glass-card"
               style={{ width: '100%', maxWidth: '400px', position: 'relative', background: 'rgba(255,255,255,0.6)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
             >
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 style={{ position: 'absolute', top: '1rem', right: '1rem', color: 'var(--text-muted)' }}
               >
                 <X size={20} />
               </button>
-              
+
               <h3 style={{ marginBottom: '1.5rem', fontWeight: 600 }}>Add New Tuition</h3>
-              
+
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label className="form-label">Student Name / Batch</label>
