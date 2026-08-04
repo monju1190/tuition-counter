@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { login } from '@/actions/auth'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -63,15 +64,31 @@ export default function LoginPage() {
             />
           </div>
           
-          <div className="form-group" style={{ textAlign: 'left' }}>
+          <div className="form-group" style={{ textAlign: 'left', position: 'relative' }}>
             <label className="form-label">Password</label>
             <input 
-              type="password" 
+              type={showPassword ? 'text' : 'password'} 
               name="password"
               className="input-field" 
               placeholder="••••••••"
+              style={{ paddingRight: '2.5rem' }}
               required 
             />
+            <button 
+              type="button" 
+              onClick={() => setShowPassword(!showPassword)}
+              style={{ 
+                position: 'absolute', 
+                right: '10px', 
+                top: '36px', 
+                color: 'var(--text-muted)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
 
           {error && (

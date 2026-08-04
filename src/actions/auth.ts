@@ -8,15 +8,20 @@ import bcrypt from 'bcryptjs'
 const SESSION_COOKIE = 'tuition_session'
 
 export async function login(formData: FormData) {
-  const username = formData.get('username') as string
-  const password = formData.get('password') as string
+  const username = (formData.get('username') as string)?.trim()
+  const password = (formData.get('password') as string)?.trim()
 
   if (!username || !password) {
     return { error: 'Please fill in all fields' }
   }
 
-  const user = await prisma.user.findUnique({
-    where: { username }
+  const user = await prisma.user.findFirst({
+    where: { 
+      username: {
+        equals: username,
+        mode: 'insensitive'
+      }
+    }
   })
 
   if (!user) {
