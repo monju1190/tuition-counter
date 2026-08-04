@@ -37,8 +37,9 @@ export default function AddTuitionModal() {
         {isOpen && (
           <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
             zIndex: 1000,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '1rem'
@@ -48,7 +49,7 @@ export default function AddTuitionModal() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="glass-card"
-              style={{ width: '100%', maxWidth: '400px', position: 'relative', background: 'rgba(255,255,255,0.7)' }}
+              style={{ width: '100%', maxWidth: '400px', position: 'relative', background: 'rgba(255,255,255,0.6)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
             >
               <button 
                 onClick={() => setIsOpen(false)}
