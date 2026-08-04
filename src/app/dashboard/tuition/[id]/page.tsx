@@ -2,8 +2,8 @@ import { getSession } from '@/actions/auth'
 import prisma from '@/lib/db'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle2, Calendar, RotateCcw } from 'lucide-react'
-import { addClassEntry, resetTuitionCycle } from '@/actions/tuitions'
+import { ArrowLeft, CheckCircle2, Calendar, RotateCcw, Trash2 } from 'lucide-react'
+import { addClassEntry, resetTuitionCycle, deleteClassEntry } from '@/actions/tuitions'
 import { format } from 'date-fns'
 
 export default async function TuitionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -108,10 +108,18 @@ export default async function TuitionPage({ params }: { params: Promise<{ id: st
                 }}>
                   {tuition.entries.length - idx}
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 500 }}>{format(new Date(entry.date), 'EEEE')}</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{format(new Date(entry.date), 'dd MMM yyyy, h:mm a')}</div>
                 </div>
+                <form action={async () => {
+                  'use server'
+                  await deleteClassEntry(entry.id, tuition.id)
+                }}>
+                  <button type="submit" className="icon-btn-danger" style={{ padding: '0.5rem' }} title="Remove this class">
+                    <Trash2 size={16} />
+                  </button>
+                </form>
               </div>
             ))}
           </div>
