@@ -37,19 +37,30 @@ export default function AddTuitionModal() {
         {isOpen && (
           <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
             zIndex: 1000,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '1rem'
           }}>
-            <motion.div
+            {/* Separate absolute div for blur to avoid transform bugs in browsers */}
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+              }}
+              onClick={() => setIsOpen(false)}
+            />
+            
+            <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="glass-card"
-              style={{ width: '100%', maxWidth: '400px', position: 'relative', background: 'rgba(255,255,255,0.6)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+              style={{ width: '100%', maxWidth: '400px', position: 'relative', background: 'rgba(255,255,255,0.95)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', zIndex: 1001 }}
             >
               <button
                 onClick={() => setIsOpen(false)}
