@@ -6,7 +6,7 @@ import { createTuition, deleteTuition } from '@/actions/tuitions'
 
 export default async function DashboardPage() {
   const session = await getSession()
-  
+
   if (!session) return null
 
   const tuitions = await prisma.tuition.findMany({
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
           tuitions.map((tuition) => {
             const count = tuition._count.entries
             const progress = (count / tuition.totalClasses) * 100
-            
+
             return (
               <div key={tuition.id} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -64,9 +64,9 @@ export default async function DashboardPage() {
                     </span>
                   </div>
                   <div style={{ width: '100%', height: '8px', background: 'rgba(0,0,0,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ 
-                      height: '100%', 
-                      width: `${Math.min(progress, 100)}%`, 
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min(progress, 100)}%`,
                       background: count >= tuition.totalClasses ? 'var(--success)' : 'var(--accent)',
                       borderRadius: '4px',
                       transition: 'width 0.5s ease'
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             <input type="text" name="studentName" className="input-field" placeholder="e.g. Class 10 Math Batch" required />
           </div>
           <div className="form-group">
-            <label className="form-label">Subject</label>
+            <label className="form-label">Class</label>
             <input type="text" name="subject" className="input-field" placeholder="e.g. Higher Math" required />
           </div>
           <div className="form-group">
