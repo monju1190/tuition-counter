@@ -1,8 +1,9 @@
 import { getSession } from '@/actions/auth'
 import prisma from '@/lib/db'
 import Link from 'next/link'
-import { Plus, Book, Trash2, CalendarDays } from 'lucide-react'
-import { createTuition, deleteTuition } from '@/actions/tuitions'
+import { Book, Trash2, CalendarDays } from 'lucide-react'
+import { deleteTuition } from '@/actions/tuitions'
+import AddTuitionModal from '@/components/AddTuitionModal'
 
 export default async function DashboardPage() {
   const session = await getSession()
@@ -26,6 +27,7 @@ export default async function DashboardPage() {
           <h1 className="page-title" style={{ fontSize: '1.5rem', marginBottom: '0.2rem' }}>My Tuitions</h1>
           <p className="page-subtitle" style={{ margin: 0 }}>Manage your classes and cycles.</p>
         </div>
+        <AddTuitionModal />
       </div>
 
       <div style={{ display: 'grid', gap: '1rem', marginBottom: '2rem' }}>
@@ -79,26 +81,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      <div className="glass-card">
-        <h3 style={{ marginBottom: '1.5rem', fontWeight: 600 }}>Add New Tuition</h3>
-        <form action={createTuition}>
-          <div className="form-group">
-            <label className="form-label">Student Name / Batch</label>
-            <input type="text" name="studentName" className="input-field" placeholder="e.g. Class 10 Math Batch" required />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Class</label>
-            <input type="text" name="subject" className="input-field" placeholder="e.g. Higher Math" required />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Total Classes per Month/Cycle</label>
-            <input type="number" name="totalClasses" className="input-field" defaultValue={12} min={1} max={30} required />
-          </div>
-          <button type="submit" className="btn-primary">
-            <Plus size={18} /> Add Tuition
-          </button>
-        </form>
-      </div>
+
     </div>
   )
 }
