@@ -60,7 +60,16 @@ export default function AddTuitionModal() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="glass-card"
-              style={{ width: '100%', maxWidth: '400px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', zIndex: 1001 }}
+              style={{ 
+                width: '100%', 
+                maxWidth: '400px', 
+                position: 'relative', 
+                background: 'rgba(255, 255, 255, 0.85)', 
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)', 
+                zIndex: 1001 
+              }}
             >
               <button
                 onClick={() => setIsOpen(false)}
