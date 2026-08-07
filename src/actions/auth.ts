@@ -65,3 +65,39 @@ export async function getSession() {
 
   return user
 }
+
+export async function changePassword(formData: FormData) {
+  const currentPassword = (formData.get('currentPassword') as string)?.trim()
+  const newPassword = (formData.get('newPassword') as string)?.trim()
+
+  if (!currentPassword || !newPassword) {
+    return { error: 'Please fill in all fields' }
+  }
+
+  const session = await getSession()
+  if (!session) {
+    return { error: 'Not authenticated' }
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.id }
+  })
+
+  if (!user) {
+    return { error: 'User not found' }
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.password)
+  if (!isValid) {
+    return { error: 'Incorrect current password' }
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10)
+  
+  await prisma.user.update({
+    where: { id: session.id },
+    data: { password: hashedPassword }
+  })
+
+  return { success: true }
+}

@@ -1,6 +1,7 @@
 import { getSession, logout } from '@/actions/auth'
 import { redirect } from 'next/navigation'
 import { LogOut, User } from 'lucide-react'
+import ChangePasswordModal from '@/components/ChangePasswordModal'
 
 export default async function DashboardLayout({
   children,
@@ -44,20 +45,24 @@ export default async function DashboardLayout({
             <span>{session.username}'s Dashboard</span>
           </div>
           
-          <form action={logout}>
-            <button type="submit" className="btn-ghost" style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.4rem', 
-              fontSize: '0.9rem',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '8px',
-              transition: 'all 0.2s'
-            }}>
-              <LogOut size={16} />
-              Logout
-            </button>
-          </form>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ChangePasswordModal />
+            <form action={logout}>
+              <button type="submit" className="btn-ghost" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.4rem', 
+                fontSize: '0.9rem',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '8px',
+                transition: 'all 0.2s'
+              }}>
+                <LogOut size={16} />
+                Logout
+              </button>
+            </form>
+          </div>
+
         </div>
       </header>
 
