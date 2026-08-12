@@ -42,9 +42,9 @@ export default function AddTuitionModal() {
             padding: '1rem'
           }}>
             {/* Separate absolute div for blur to avoid transform bugs in browsers */}
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               style={{
                 position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
@@ -54,21 +54,21 @@ export default function AddTuitionModal() {
               }}
               onClick={() => setIsOpen(false)}
             />
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="glass-card"
-              style={{ 
-                width: '100%', 
-                maxWidth: '400px', 
-                position: 'relative', 
-                background: 'rgba(255, 255, 255, 0.85)', 
+              style={{
+                width: '100%',
+                maxWidth: '400px',
+                position: 'relative',
+                background: 'rgba(255, 255, 255, 0.85)',
                 backdropFilter: 'none',
                 WebkitBackdropFilter: 'none',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)', 
-                zIndex: 1001 
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)',
+                zIndex: 1001
               }}
             >
               <button

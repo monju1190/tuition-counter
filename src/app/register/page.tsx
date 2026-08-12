@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { login } from '@/actions/auth'
+import { register } from '@/actions/auth'
 import { BookOpen, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -17,7 +17,18 @@ export default function LoginPage() {
     setError('')
     
     const formData = new FormData(e.currentTarget)
-    const result = await login(formData)
+    
+    // Check if passwords match
+    const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      setLoading(false)
+      return
+    }
+    
+    const result = await register(formData)
     
     if (result?.error) {
       setError(result.error)
@@ -50,8 +61,8 @@ export default function LoginPage() {
           <BookOpen size={32} />
         </motion.div>
         
-        <h1 className="page-title" style={{ fontSize: '1.75rem' }}>Tuition Tracker</h1>
-        <p className="page-subtitle" style={{ marginBottom: '1.5rem' }}>Welcome back. Please sign in.</p>
+        <h1 className="page-title" style={{ fontSize: '1.75rem' }}>Create Account</h1>
+        <p className="page-subtitle" style={{ marginBottom: '1.5rem' }}>Sign up to start tracking tuitions.</p>
         
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ textAlign: 'left' }}>
@@ -91,6 +102,18 @@ export default function LoginPage() {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
+          
+          <div className="form-group" style={{ textAlign: 'left', position: 'relative' }}>
+            <label className="form-label">Confirm Password</label>
+            <input 
+              type={showPassword ? 'text' : 'password'} 
+              name="confirmPassword"
+              className="input-field" 
+              placeholder="••••••••"
+              style={{ paddingRight: '2.5rem' }}
+              required 
+            />
+          </div>
 
           {error && (
             <motion.p 
@@ -102,13 +125,13 @@ export default function LoginPage() {
           )}
           
           <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '0.5rem' }}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Creating account...' : 'Sign Up'}
           </button>
           
           <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-            Don't have an account?{' '}
-            <Link href="/register" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: '500' }}>
-              Create one
+            Already have an account?{' '}
+            <Link href="/" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: '500' }}>
+              Sign in
             </Link>
           </div>
         </form>

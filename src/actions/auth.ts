@@ -46,6 +46,49 @@ export async function login(formData: FormData) {
   redirect('/dashboard')
 }
 
+export async function register(formData: FormData) {
+  const username = (formData.get('username') as string)?.trim()
+  const password = (formData.get('password') as string)?.trim()
+
+  if (!username || !password) {
+    return { error: 'Please fill in all fields' }
+  }
+
+  // Check if user already exists
+  const existingUser = await prisma.user.findFirst({
+    where: { 
+      username: {
+        equals: username,
+        mode: 'insensitive'
+      }
+    }
+  })
+
+  if (existingUser) {
+    return { error: 'Username already taken' }
+  }
+
+  // Create new user
+  const hashedPassword = await bcrypt.hash(password, 10)
+  const user = await prisma.user.create({
+    data: {
+      username,
+      password: hashedPassword
+    }
+  })
+
+  // Create session
+  const cookieStore = await cookies()
+  cookieStore.set(SESSION_COOKIE, user.id, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 30 // 30 days
+  })
+
+  redirect('/dashboard')
+}
+
 export async function logout() {
   const cookieStore = await cookies()
   cookieStore.delete(SESSION_COOKIE)
