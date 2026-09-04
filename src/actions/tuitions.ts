@@ -103,3 +103,25 @@ export async function deleteClassEntry(entryId: string, tuitionId: string) {
   revalidatePath(`/dashboard/tuition/${tuitionId}`)
   revalidatePath('/dashboard')
 }
+
+export async function updateClassEntry(entryId: string, tuitionId: string, newDateStr: string) {
+  const session = await getSession()
+  if (!session) throw new Error('Unauthorized')
+
+  // verify ownership
+  const tuition = await prisma.tuition.findUnique({
+    where: { id: tuitionId }
+  })
+
+  if (!tuition || tuition.userId !== session.id) {
+    throw new Error('Unauthorized')
+  }
+
+  await prisma.classEntry.update({
+    where: { id: entryId },
+    data: { date: new Date(newDateStr) }
+  })
+
+  revalidatePath(`/dashboard/tuition/${tuitionId}`)
+  revalidatePath('/dashboard')
+}

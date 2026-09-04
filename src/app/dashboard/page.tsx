@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Book, Trash2, CalendarDays } from 'lucide-react'
 import { deleteTuition } from '@/actions/tuitions'
 import AddTuitionModal from '@/components/AddTuitionModal'
+import DeleteTuitionButton from '@/components/DeleteTuitionButton'
 
 export default async function DashboardPage() {
   const session = await getSession()
@@ -48,14 +49,7 @@ export default async function DashboardPage() {
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.2rem' }}>{tuition.studentName}</h3>
                     <p style={{ color: 'var(--accent)', fontSize: '0.9rem', fontWeight: 500 }}>{tuition.subject}</p>
                   </Link>
-                  <form action={async () => {
-                    'use server'
-                    await deleteTuition(tuition.id)
-                  }}>
-                    <button type="submit" className="icon-btn-danger">
-                      <Trash2 size={18} />
-                    </button>
-                  </form>
+                  <DeleteTuitionButton tuitionId={tuition.id} />
                 </div>
 
                 <Link href={`/dashboard/tuition/${tuition.id}`}>
