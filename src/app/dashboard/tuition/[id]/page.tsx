@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle2, Calendar, RotateCcw, Trash2 } from 'lucide-react'
 import { addClassEntry, resetTuitionCycle, deleteClassEntry } from '@/actions/tuitions'
-import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import ClassEntryActions from '@/components/ClassEntryActions'
 import LocalTime from '@/components/LocalTime'
 
@@ -114,13 +114,17 @@ export default async function TuitionPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 500 }}>
-                    <LocalTime date={entry.date} formatStr="EEEE" />
+                    {formatInTimeZone(new Date(entry.date), 'Asia/Dhaka', "EEEE")}
                   </div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    <LocalTime date={entry.date} formatStr="dd MMM yyyy, h:mm a" />
+                    {formatInTimeZone(new Date(entry.date), 'Asia/Dhaka', "dd MMM yyyy, h:mm a")}
                   </div>
                 </div>
-                <ClassEntryActions entry={entry} tuitionId={tuition.id} />
+                <ClassEntryActions 
+                  entryId={entry.id} 
+                  tuitionId={tuition.id} 
+                  initialDateStr={formatInTimeZone(new Date(entry.date), 'Asia/Dhaka', "yyyy-MM-dd'T'HH:mm")} 
+                />
               </div>
             ))}
           </div>

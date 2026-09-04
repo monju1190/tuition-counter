@@ -1,26 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Trash2, Edit2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { deleteClassEntry, updateClassEntry } from '@/actions/tuitions'
-import { format } from 'date-fns'
+import { fromZonedTime } from 'date-fns-tz'
 
-export default function ClassEntryActions({ entry, tuitionId }: { entry: any, tuitionId: string }) {
+export default function ClassEntryActions({ entryId, tuitionId, initialDateStr }: { entryId: string, tuitionId: string, initialDateStr: string }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [dateValue, setDateValue] = useState('')
-
-  useEffect(() => {
-    // Only set the date value on the client to avoid SSR timezone mismatches
-    setDateValue(format(new Date(entry.date), "yyyy-MM-dd'T'HH:mm"))
-  }, [entry.date])
+  const [dateValue, setDateValue] = useState(initialDateStr)
 
   const handleDelete = async () => {
     setLoading(true)
     try {
-      await deleteClassEntry(entry.id, tuitionId)
+      await deleteClassEntry(entryId, tuitionId)
       setIsDeleteOpen(false)
     } catch (e) {
       console.error(e)
@@ -34,12 +29,14 @@ export default function ClassEntryActions({ entry, tuitionId }: { entry: any, tu
     setLoading(true)
     
     try {
-      // dateValue is like "2026-09-04T15:00". new Date() parses it in the local timezone.
-      // toISOString() converts it to UTC for the server.
-      await updateClassEntry(entry.id, tuitionId, new Date(dateValue).toISOString())
+      // dateValue is "YYYY-MM-DDTHH:mm" which is in Dhaka time.
+      // We explicitly convert this Dhaka time back to UTC before sending to server.
+      const utcDate = fromZonedTime(dateValue, 'Asia/Dhaka')
+      await updateClassEntry(entryId, tuitionId, utcDate.toISOString())
       setIsEditOpen(false)
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
+      alert(err.message || 'Failed to update')
     } finally {
       setLoading(false)
     }
