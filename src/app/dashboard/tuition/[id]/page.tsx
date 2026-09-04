@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, Calendar, RotateCcw, Trash2 } from 'lucide-rea
 import { addClassEntry, resetTuitionCycle, deleteClassEntry } from '@/actions/tuitions'
 import { format } from 'date-fns'
 import ClassEntryActions from '@/components/ClassEntryActions'
+import LocalTime from '@/components/LocalTime'
 
 export default async function TuitionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -110,8 +111,12 @@ export default async function TuitionPage({ params }: { params: Promise<{ id: st
                   {tuition.entries.length - idx}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500 }}>{format(new Date(entry.date), 'EEEE')}</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{format(new Date(entry.date), 'dd MMM yyyy, h:mm a')}</div>
+                  <div style={{ fontWeight: 500 }}>
+                    <LocalTime date={entry.date} formatStr="EEEE" />
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    <LocalTime date={entry.date} formatStr="dd MMM yyyy, h:mm a" />
+                  </div>
                 </div>
                 <ClassEntryActions entry={entry} tuitionId={tuition.id} />
               </div>
