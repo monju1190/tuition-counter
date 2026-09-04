@@ -6,6 +6,8 @@ import { deleteTuition } from '@/actions/tuitions'
 import AddTuitionModal from '@/components/AddTuitionModal'
 import DeleteTuitionButton from '@/components/DeleteTuitionButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const session = await getSession()
 

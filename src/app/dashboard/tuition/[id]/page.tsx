@@ -8,6 +8,8 @@ import { format } from 'date-fns'
 import ClassEntryActions from '@/components/ClassEntryActions'
 import LocalTime from '@/components/LocalTime'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TuitionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   

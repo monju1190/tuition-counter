@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Trash2, Edit2, X, Check } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Trash2, Edit2, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { deleteClassEntry, updateClassEntry } from '@/actions/tuitions'
 import { format } from 'date-fns'
@@ -10,9 +10,12 @@ export default function ClassEntryActions({ entry, tuitionId }: { entry: any, tu
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [dateValue, setDateValue] = useState('')
 
-  // format for datetime-local input: YYYY-MM-DDTHH:mm
-  const defaultDateStr = format(new Date(entry.date), "yyyy-MM-dd'T'HH:mm")
+  useEffect(() => {
+    // Only set the date value on the client to avoid SSR timezone mismatches
+    setDateValue(format(new Date(entry.date), "yyyy-MM-dd'T'HH:mm"))
+  }, [entry.date])
 
   const handleDelete = async () => {
     setLoading(true)
@@ -29,11 +32,11 @@ export default function ClassEntryActions({ entry, tuitionId }: { entry: any, tu
   const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
-    const formData = new FormData(e.currentTarget)
-    const newDateStr = formData.get('date') as string
     
     try {
-      await updateClassEntry(entry.id, tuitionId, new Date(newDateStr).toISOString())
+      // dateValue is like "2026-09-04T15:00". new Date() parses it in the local timezone.
+      // toISOString() converts it to UTC for the server.
+      await updateClassEntry(entry.id, tuitionId, new Date(dateValue).toISOString())
       setIsEditOpen(false)
     } catch (err) {
       console.error(err)
@@ -171,7 +174,8 @@ export default function ClassEntryActions({ entry, tuitionId }: { entry: any, tu
                     type="datetime-local" 
                     name="date" 
                     className="input-field" 
-                    defaultValue={defaultDateStr} 
+                    value={dateValue}
+                    onChange={(e) => setDateValue(e.target.value)}
                     required 
                   />
                 </div>
