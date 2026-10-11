@@ -1,7 +1,7 @@
 import { getSession } from '@/actions/auth'
 import prisma from '@/lib/db'
 import Link from 'next/link'
-import { Book, Trash2, CalendarDays } from 'lucide-react'
+import { Book, Trash2, CalendarDays, History } from 'lucide-react'
 import { deleteTuition } from '@/actions/tuitions'
 import AddTuitionModal from '@/components/AddTuitionModal'
 import DeleteTuitionButton from '@/components/DeleteTuitionButton'
@@ -16,8 +16,11 @@ export default async function DashboardPage() {
   const tuitions = await prisma.tuition.findMany({
     where: { userId: session.id },
     include: {
+      entries: {
+        where: { cycleId: null }
+      },
       _count: {
-        select: { entries: true }
+        select: { cycles: true }
       }
     },
     orderBy: { createdAt: 'desc' }
@@ -41,7 +44,8 @@ export default async function DashboardPage() {
           </div>
         ) : (
           tuitions.map((tuition) => {
-            const count = tuition._count.entries
+            const count = tuition.entries.length
+            const cyclesCompleted = tuition._count.cycles
             const progress = (count / tuition.totalClasses) * 100
 
             return (
@@ -49,7 +53,24 @@ export default async function DashboardPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <Link href={`/dashboard/tuition/${tuition.id}`} style={{ flex: 1 }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.2rem' }}>{tuition.studentName}</h3>
-                    <p style={{ color: 'var(--accent)', fontSize: '0.9rem', fontWeight: 500 }}>{tuition.subject}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <span style={{ color: 'var(--accent)', fontSize: '0.9rem', fontWeight: 500 }}>{tuition.subject}</span>
+                      {cyclesCompleted > 0 && (
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 600,
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '12px',
+                          background: 'rgba(16, 185, 129, 0.1)',
+                          color: 'var(--success)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.25rem'
+                        }}>
+                          <History size={11} /> {cyclesCompleted} {cyclesCompleted === 1 ? 'Month Done' : 'Months Done'}
+                        </span>
+                      )}
+                    </div>
                   </Link>
                   <DeleteTuitionButton tuitionId={tuition.id} />
                 </div>

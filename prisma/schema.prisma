@@ -16,19 +16,34 @@ model User {
 }
 
 model Tuition {
-  id          String       @id @default(uuid())
-  studentName String
-  subject     String
-  totalClasses Int         @default(12) // Usually 12
-  userId      String
-  user        User         @relation(fields: [userId], references: [id])
-  entries     ClassEntry[]
-  createdAt   DateTime     @default(now())
+  id           String         @id @default(uuid())
+  studentName  String
+  subject      String
+  totalClasses Int            @default(12) // Usually 12
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries      ClassEntry[]
+  cycles       TuitionCycle[]
+  createdAt    DateTime       @default(now())
+}
+
+model TuitionCycle {
+  id           String       @id @default(uuid())
+  cycleNumber  Int
+  name         String?
+  totalClasses Int          @default(12)
+  completedAt  DateTime     @default(now())
+  tuitionId    String
+  tuition      Tuition      @relation(fields: [tuitionId], references: [id], onDelete: Cascade)
+  entries      ClassEntry[]
+  createdAt    DateTime     @default(now())
 }
 
 model ClassEntry {
-  id        String   @id @default(uuid())
-  date      DateTime @default(now())
+  id        String        @id @default(uuid())
+  date      DateTime      @default(now())
   tuitionId String
-  tuition   Tuition  @relation(fields: [tuitionId], references: [id])
+  tuition   Tuition       @relation(fields: [tuitionId], references: [id], onDelete: Cascade)
+  cycleId   String?
+  cycle     TuitionCycle? @relation(fields: [cycleId], references: [id], onDelete: Cascade)
 }

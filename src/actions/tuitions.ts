@@ -32,8 +32,11 @@ export async function deleteTuition(id: string) {
   const session = await getSession()
   if (!session) throw new Error('Unauthorized')
 
-  // delete related entries first
+  // delete related entries and cycles first
   await prisma.classEntry.deleteMany({
+    where: { tuitionId: id }
+  })
+  await prisma.tuitionCycle.deleteMany({
     where: { tuitionId: id }
   })
 
@@ -68,15 +71,71 @@ export async function addClassEntry(tuitionId: string, dateStr: string) {
   revalidatePath('/dashboard')
 }
 
-export async function resetTuitionCycle(tuitionId: string) {
+export async function resetTuitionCycle(tuitionId: string, cycleName?: string) {
   const session = await getSession()
   if (!session) throw new Error('Unauthorized')
 
-  // For this simple app, resetting just clears all entries for the tuition.
-  // We could archive it if history is needed, but the prompt just said "reset hoye notun mash shuru hbe".
-  // So deleting entries starts the counter from 0.
-  await prisma.classEntry.deleteMany({
+  const tuition = await prisma.tuition.findUnique({
+    where: { id: tuitionId }
+  })
+
+  if (!tuition || tuition.userId !== session.id) {
+    throw new Error('Unauthorized')
+  }
+
+  // Count past cycles to calculate cycle number
+  const pastCyclesCount = await prisma.tuitionCycle.count({
     where: { tuitionId }
+  })
+
+  const cycleNumber = pastCyclesCount + 1
+
+  // Create TuitionCycle archive
+  const cycle = await prisma.tuitionCycle.create({
+    data: {
+      cycleNumber,
+      name: cycleName?.trim() || `Cycle ${cycleNumber}`,
+      totalClasses: tuition.totalClasses,
+      completedAt: new Date(),
+      tuitionId
+    }
+  })
+
+  // Move all currently active entries to this completed cycle
+  await prisma.classEntry.updateMany({
+    where: {
+      tuitionId,
+      cycleId: null
+    },
+    data: {
+      cycleId: cycle.id
+    }
+  })
+
+  revalidatePath(`/dashboard/tuition/${tuitionId}`)
+  revalidatePath('/dashboard')
+}
+
+export async function deleteTuitionCycle(cycleId: string, tuitionId: string) {
+  const session = await getSession()
+  if (!session) throw new Error('Unauthorized')
+
+  const tuition = await prisma.tuition.findUnique({
+    where: { id: tuitionId }
+  })
+
+  if (!tuition || tuition.userId !== session.id) {
+    throw new Error('Unauthorized')
+  }
+
+  // Delete all class entries in this cycle
+  await prisma.classEntry.deleteMany({
+    where: { cycleId }
+  })
+
+  // Delete the cycle itself
+  await prisma.tuitionCycle.delete({
+    where: { id: cycleId }
   })
 
   revalidatePath(`/dashboard/tuition/${tuitionId}`)
