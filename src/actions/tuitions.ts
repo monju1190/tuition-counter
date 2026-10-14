@@ -184,3 +184,27 @@ export async function updateClassEntry(entryId: string, tuitionId: string, newDa
   revalidatePath(`/dashboard/tuition/${tuitionId}`)
   revalidatePath('/dashboard')
 }
+
+export async function togglePaymentStatus(cycleId: string, tuitionId: string, currentIsPaid: boolean) {
+  const session = await getSession()
+  if (!session) throw new Error('Unauthorized')
+
+  const tuition = await prisma.tuition.findUnique({
+    where: { id: tuitionId }
+  })
+
+  if (!tuition || tuition.userId !== session.id) {
+    throw new Error('Unauthorized')
+  }
+
+  await prisma.tuitionCycle.update({
+    where: { id: cycleId },
+    data: {
+      isPaid: !currentIsPaid,
+      paidAt: !currentIsPaid ? new Date() : null
+    }
+  })
+
+  revalidatePath(`/dashboard/tuition/${tuitionId}`)
+  revalidatePath('/dashboard')
+}

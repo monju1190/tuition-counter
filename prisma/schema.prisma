@@ -33,6 +33,8 @@ model TuitionCycle {
   name         String?
   totalClasses Int          @default(12)
   completedAt  DateTime     @default(now())
+  isPaid       Boolean      @default(false)
+  paidAt       DateTime?
   tuitionId    String
   tuition      Tuition      @relation(fields: [tuitionId], references: [id], onDelete: Cascade)
   entries      ClassEntry[]

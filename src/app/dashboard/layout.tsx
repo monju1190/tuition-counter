@@ -1,7 +1,8 @@
 import { getSession, logout } from '@/actions/auth'
 import { redirect } from 'next/navigation'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, Sparkles } from 'lucide-react'
 import ChangePasswordModal from '@/components/ChangePasswordModal'
+import Link from 'next/link'
 
 export default async function DashboardLayout({
   children,
@@ -46,6 +47,25 @@ export default async function DashboardLayout({
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Link
+              href="/dashboard/study-ai"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                padding: '0.4rem 0.9rem',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(236,72,153,0.1))',
+                border: '1px solid rgba(99,102,241,0.2)',
+                color: 'var(--accent)',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Sparkles size={15} />
+              AI Study
+            </Link>
             <ChangePasswordModal />
             <form action={logout}>
               <button type="submit" className="btn-ghost" style={{ 

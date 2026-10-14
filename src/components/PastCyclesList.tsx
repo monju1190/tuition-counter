@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronUp, Calendar, Trash2, CheckCircle2, History, Clock } from 'lucide-react'
+import { ChevronDown, ChevronUp, Calendar, Trash2, CheckCircle2, History, Clock, DollarSign, XCircle } from 'lucide-react'
 import { formatInTimeZone } from 'date-fns-tz'
-import { deleteTuitionCycle } from '@/actions/tuitions'
+import { deleteTuitionCycle, togglePaymentStatus } from '@/actions/tuitions'
 
 interface CycleEntry {
   id: string
@@ -17,6 +17,8 @@ interface PastCycle {
   name: string | null
   totalClasses: number
   completedAt: string | Date
+  isPaid: boolean
+  paidAt: string | Date | null
   entries: CycleEntry[]
 }
 
@@ -29,6 +31,7 @@ export default function PastCyclesList({ cycles, tuitionId }: PastCyclesListProp
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({})
   const [deleteCycleId, setDeleteCycleId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [paymentLoadingId, setPaymentLoadingId] = useState<string | null>(null)
 
   const toggleExpand = (id: string) => {
     setExpandedIds(prev => ({
@@ -48,6 +51,17 @@ export default function PastCyclesList({ cycles, tuitionId }: PastCyclesListProp
       alert(err.message || 'Failed to delete cycle')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleTogglePayment = async (cycleId: string, currentIsPaid: boolean) => {
+    setPaymentLoadingId(cycleId)
+    try {
+      await togglePaymentStatus(cycleId, tuitionId, currentIsPaid)
+    } catch (err: any) {
+      alert(err.message || 'Failed to update payment status')
+    } finally {
+      setPaymentLoadingId(null)
     }
   }
 
@@ -146,6 +160,31 @@ export default function PastCyclesList({ cycles, tuitionId }: PastCyclesListProp
 
               {/* Action buttons */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {/* Payment Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => handleTogglePayment(cycle.id, cycle.isPaid)}
+                  disabled={paymentLoadingId === cycle.id}
+                  title={cycle.isPaid ? 'Mark as Unpaid' : 'Mark as Paid'}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    padding: '0.45rem 0.75rem',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    border: cycle.isPaid ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(0,0,0,0.1)',
+                    background: cycle.isPaid ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.08)',
+                    color: cycle.isPaid ? 'var(--success)' : '#f59e0b',
+                    cursor: paymentLoadingId === cycle.id ? 'wait' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    opacity: paymentLoadingId === cycle.id ? 0.6 : 1,
+                  }}
+                >
+                  {cycle.isPaid ? <><CheckCircle2 size={14} /> Paid</> : <><DollarSign size={14} /> Unpaid</>}
+                </button>
+
                 <button
                   type="button"
                   onClick={() => toggleExpand(cycle.id)}
