@@ -138,7 +138,7 @@ export default function StudyAIPage() {
           <h1 className="page-title" style={{ fontSize: '1.5rem', marginBottom: 0 }}>AI Study Tool</h1>
         </div>
         <p className="page-subtitle" style={{ margin: 0, fontSize: '0.9rem' }}>
-          Upload your file or type a topic — AI will generate questions, notes, or flashcards for you.
+          Upload a file or type a topic — AI will generate questions, notes, or flashcards for you.
         </p>
       </div>
 
