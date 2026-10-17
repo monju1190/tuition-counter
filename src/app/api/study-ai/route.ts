@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 import { getSession } from '@/actions/auth'
 
 export const maxDuration = 60
@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    return NextResponse.json({ error: 'Gemini API key not configured. Please add GEMINI_API_KEY to your .env file.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Gemini API key not configured. Please add GEMINI_API_KEY to your .env file.' },
+      { status: 500 }
+    )
   }
 
   try {
@@ -25,33 +28,73 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Instruction is required.' }, { status: 400 })
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
+    const ai = new GoogleGenAI({ apiKey })
     const systemPrompt = buildSystemPrompt(outputType)
 
-    let parts: any[] = []
+    const contentParts: any[] = []
 
     if (file && file.size > 0) {
       const bytes = await file.arrayBuffer()
       const base64 = Buffer.from(bytes).toString('base64')
       const mimeType = file.type || 'application/octet-stream'
 
-      parts.push({
+      contentParts.push({
         inlineData: {
           data: base64,
-          mimeType
-        }
+          mimeType,
+        },
       })
-      parts.push({ text: `\n\nInstruction: ${instruction}\n\n${systemPrompt}` })
-    } else {
-      // Text-only mode
-      parts.push({ text: `Instruction: ${instruction}\n\n${systemPrompt}` })
     }
 
-    const result = await model.generateContent(parts)
-    const response = result.response
-    const text = response.text()
+    contentParts.push({
+      text: `Instruction: ${instruction}\n\n${systemPrompt}`,
+    })
+
+    // Try models in order — fall back if one is overloaded
+    const MODELS = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-exp']
+    const MAX_RETRIES = 3
+    const RETRY_DELAY_MS = 1500
+
+    let text = ''
+    let lastError: any = null
+
+    outer: for (const modelName of MODELS) {
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelName,
+            contents: [{ role: 'user', parts: contentParts }],
+          })
+          text = response.text ?? ''
+          break outer // success — exit both loops
+        } catch (err: any) {
+          lastError = err
+          const is503 = err?.message?.includes('503') || err?.message?.includes('UNAVAILABLE') || err?.status === 503
+          const isModelGone = err?.message?.includes('404') || err?.message?.includes('NOT_FOUND') || err?.message?.includes('no longer available')
+
+          if (isModelGone) {
+            // This model doesn't exist — try the next one immediately
+            break
+          }
+          if (is503 && attempt < MAX_RETRIES) {
+            // Overloaded — wait and retry same model
+            await new Promise(r => setTimeout(r, RETRY_DELAY_MS * attempt))
+            continue
+          }
+          // Any other error — try next model
+          break
+        }
+      }
+    }
+
+    if (!text) {
+      const msg = lastError?.message || 'Failed to generate content.'
+      const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
+      return NextResponse.json(
+        { error: isOverloaded ? 'The AI is very busy right now. Please wait a few seconds and try again.' : msg },
+        { status: 503 }
+      )
+    }
 
     return NextResponse.json({ result: text })
   } catch (err: any) {
