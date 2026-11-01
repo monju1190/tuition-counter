@@ -16,7 +16,7 @@ const OUTPUT_TYPES = [
 ]
 
 const QUICK_INSTRUCTIONS = [
-  'Make 10 MCQ questions from this',
+  'Make 10 MCQ questions from this topic',
   'Summarize the key concepts',
   'Create flashcards for revision',
   'Write structured study notes',
