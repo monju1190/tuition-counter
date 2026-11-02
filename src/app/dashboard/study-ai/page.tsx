@@ -19,7 +19,7 @@ const QUICK_INSTRUCTIONS = [
   'Make 10 MCQ questions from this topic',
   'Summarize the key concepts',
   'Create flashcards for revision',
-  'Write structured study notes',
+  'Write easy and understandable study notes',
   'List the most important points',
   'Explain each topic simply',
 ]
