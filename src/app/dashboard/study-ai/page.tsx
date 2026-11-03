@@ -20,7 +20,7 @@ const QUICK_INSTRUCTIONS = [
   'Summarize the key concepts',
   'Create flashcards for revision',
   'Write easy and understandable study notes',
-  'List the most important points',
+  'List the most important points from pdf',
   'Explain each topic simply',
 ]
 
